@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { razorpayConfig, razorpayRequest } from "@/lib/razorpay";
 import { shopifyAdmin } from "@/lib/shopify";
 
-const ORDER_QUERY = \`
+const ORDER_QUERY = `
   query OrderAmount($id: ID!) {
     order(id: $id) {
       id
@@ -10,7 +10,7 @@ const ORDER_QUERY = \`
       totalPriceSet { shopMoney { amount currencyCode } }
     }
   }
-\`;
+`;
 
 type RazorpayOrder = {
   id: string;
