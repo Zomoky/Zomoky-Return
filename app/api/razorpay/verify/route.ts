@@ -2,20 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { razorpayRequest, verifyCheckoutSignature } from "@/lib/razorpay";
 import { shopifyAdmin } from "@/lib/shopify";
 
-const ORDER_QUERY = \`
+const ORDER_QUERY = `
   query OrderStatus($id: ID!) {
     order(id: $id) { id name displayFinancialStatus }
   }
-\`;
+`;
 
-const MARK_PAID = \`
+const MARK_PAID = `
   mutation MarkPaid($input: OrderMarkAsPaidInput!) {
     orderMarkAsPaid(input: $input) {
       userErrors { field message }
       order { id name displayFinancialStatus }
     }
   }
-\`;
+`;
 
 type RazorpayPayment = { id: string; order_id: string; status: string; amount: number; currency: string };
 
