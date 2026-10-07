@@ -1,0 +1,319 @@
+:root {
+  --brand: #2f6fe4;
+  --page: #f5f7ff;
+  --card: #ffffff;
+  --line: #e8e9ee;
+  --text: #121212;
+  --muted: #858585;
+  --placeholder: #8a8a8a;
+  --danger: #ff1d25;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #fff;
+  color: var(--text);
+}
+
+button, input { font: inherit; }
+button { cursor: pointer; }
+
+.checkout-page {
+  min-height: 100vh;
+  background: #fff;
+}
+
+.checkout-header {
+  width: 100%;
+  height: 56px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 20px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.back-button {
+  justify-self: start;
+  border: 0;
+  background: transparent;
+  font-size: 32px;
+  line-height: 1;
+  padding: 0;
+  color: #555;
+  transform: translateY(-2px);
+}
+
+.logo-lockup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 23px;
+  font-weight: 900;
+  letter-spacing: .015em;
+}
+
+.logo-mark {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #111;
+  border-radius: 3px;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.header-spacer { justify-self: end; width: 24px; }
+
+.checkout-wrap {
+  width: min(100%, 728px);
+  margin: 0 auto;
+  padding: 14px 18px 44px;
+  background: var(--page);
+  min-height: calc(100vh - 56px);
+}
+
+.summary-bar {
+  min-height: 84px;
+  padding: 0 23px;
+  border-radius: 22px;
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 2px rgba(0,0,0,.03);
+  margin-bottom: 12px;
+}
+
+.summary-bar > div:first-child {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.summary-bar strong { font-size: 24px; }
+.summary-bar span { font-size: 20px; color: #222; }
+.summary-price { display: flex; align-items: center; gap: 7px; }
+.summary-price del { color: #a3a3a3; font-size: 15px; }
+.summary-price strong { font-size: 19px; }
+.chevron { font-size: 33px !important; color: #888 !important; line-height: .8; }
+
+.card {
+  background: var(--card);
+  border-radius: 22px;
+  padding: 22px 24px;
+  margin-bottom: 12px;
+}
+
+.coupon-card {
+  min-height: 104px;
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.coupon-icon {
+  width: 31px;
+  height: 31px;
+  border-radius: 7px;
+  background: #5c993d;
+  color: white;
+  display: grid;
+  place-items: center;
+  font-size: 21px;
+  font-weight: 900;
+}
+
+.coupon-card input {
+  border: 0;
+  outline: 0;
+  width: 100%;
+  font-size: 20px;
+  color: #222;
+  background: transparent;
+}
+.coupon-card input::placeholder { color: #c4c4c4; }
+.apply-button {
+  color: var(--brand);
+  border: 0;
+  background: transparent;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.card h2 {
+  font-size: 24px;
+  margin: 0 0 10px;
+}
+
+.phone-row {
+  height: 69px;
+  border: 1px solid #e3e3e3;
+  border-radius: 9px;
+  display: grid;
+  grid-template-columns: 97px 1fr;
+  overflow: hidden;
+  box-shadow: 0 1px 7px rgba(0,0,0,.06) inset;
+}
+
+.country-code {
+  border-right: 1px solid #e6e6e6;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 14px;
+  font-size: 21px;
+  color: #555;
+}
+.country-code span { font-size: 22px; }
+
+.phone-row input {
+  border: 0;
+  outline: 0;
+  padding: 0 13px;
+  font-size: 20px;
+}
+.phone-row input::placeholder { color: #c2c2c2; }
+
+.error-text {
+  color: var(--danger);
+  font-size: 16px;
+  margin: 5px 0 0;
+}
+
+.address-card { padding-bottom: 28px; }
+
+.field {
+  display: block;
+  margin-bottom: 14px;
+}
+.field span {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 800;
+  color: #757575;
+  margin-left: 19px;
+  margin-bottom: -8px;
+  position: relative;
+  z-index: 2;
+  background: white;
+  padding: 0 5px;
+}
+.field em { font-style: normal; color: #f23b4a; margin-left: 2px; }
+
+.field input {
+  width: 100%;
+  height: 64px;
+  border: 1px solid #dfe0e4;
+  border-radius: 9px;
+  background: #fafafa;
+  padding: 0 17px;
+  font-size: 19px;
+  outline: none;
+}
+.field input:focus {
+  border-color: #b7c8f0;
+  background: #fff;
+}
+.field input::placeholder { color: #787878; font-weight: 600; }
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+.landmark-link {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--brand);
+  font-size: 17px;
+  margin: -4px 0 18px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.helper {
+  color: #666;
+  font-size: 17px;
+  font-style: italic;
+  margin: -3px 0 26px;
+}
+
+.address-type h3 {
+  margin: 0 0 17px;
+  font-size: 17px;
+  font-weight: 700;
+}
+.radio-row { display: flex; gap: 42px; }
+.radio-option {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-size: 20px;
+  color: #151515;
+}
+.radio {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #5d5d5d;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.radio.selected { border-width: 6px; }
+
+.continue-area { padding: 5px 2px 16px; }
+.continue-button {
+  width: 100%;
+  height: 58px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--brand);
+  color: white;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+@media (max-width: 560px) {
+  .checkout-header { height: 52px; padding: 0 14px; }
+  .logo-lockup { font-size: 19px; }
+  .logo-mark { width: 26px; height: 26px; font-size: 15px; }
+  .back-button { font-size: 29px; }
+  .checkout-wrap { padding: 8px 10px 36px; }
+  .summary-bar, .card { border-radius: 18px; }
+  .summary-bar { min-height: 78px; padding: 0 17px; }
+  .summary-bar strong { font-size: 18px; }
+  .summary-bar span { font-size: 15px; }
+  .summary-price del { font-size: 12px; }
+  .summary-price strong { font-size: 17px; }
+  .coupon-card { min-height: 94px; padding: 18px; }
+  .coupon-card input, .apply-button { font-size: 17px; }
+  .card { padding: 18px; }
+  .card h2 { font-size: 21px; }
+  .phone-row { height: 62px; grid-template-columns: 90px 1fr; }
+  .country-code { font-size: 18px; }
+  .phone-row input { font-size: 17px; }
+  .error-text { font-size: 14px; }
+  .field input { height: 59px; font-size: 16px; }
+  .two-col { gap: 10px; }
+  .radio-row { gap: 22px; }
+  .radio-option { font-size: 17px; }
+}
+
+@media (min-width: 900px) {
+  .checkout-wrap { margin-top: 0; }
+}
