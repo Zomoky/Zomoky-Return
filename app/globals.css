@@ -360,6 +360,45 @@ button { cursor: pointer; }
 
 .order-total strong { font-size: 18px; }
 
+
+.payment-card-wrap .two-col { margin-top: 4px; }
+.method {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 12px;
+  padding: 13px;
+  text-align: left;
+  min-height: 72px;
+}
+.method.active {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px rgba(95,43,96,.08);
+}
+.method b, .method span { display: block; }
+.method b { font-size: 12px; }
+.method span { margin-top: 4px; color: var(--muted); font-size: 10px; }
+.checkout-total {
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin: 4px 0 12px;
+}
+.checkout-total > div { display: flex; justify-content: space-between; align-items: center; }
+.checkout-total span { font-size: 12px; color: var(--muted); }
+.checkout-total strong { font-size: 20px; }
+.checkout-total small { display: block; margin-top: 4px; color: var(--green); font-size: 10px; }
+.success-box {
+  background: #eef9f3;
+  border: 1px solid #b9e4cc;
+  color: #126b45;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.continue-button:disabled { opacity: .55; cursor: not-allowed; }
+
 @media (max-width: 600px) {
   .checkout-wrap { padding: 10px 10px 26px; }
   .card { padding: 15px; border-radius: 15px; }
