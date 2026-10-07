@@ -19,6 +19,10 @@ type CheckoutBody = {
   coupon?: string;
 };
 
+const VARIANT_QUERY = `
+  query VariantPrice($id: ID!) { productVariant(id: $id) { id price } }
+`;
+
 const MUTATION = `
   mutation CreateOrder($order: OrderCreateOrderInput!, $options: OrderCreateOptionsInput) {
     orderCreate(order: $order, options: $options) {
@@ -28,6 +32,7 @@ const MUTATION = `
         name
         displayFinancialStatus
         statusPageUrl
+        totalPriceSet { shopMoney { amount currencyCode } }
       }
     }
   }
@@ -62,12 +67,30 @@ export async function POST(request: NextRequest) {
 
     const quantity = Math.min(20, Math.max(1, Number(body.quantity || 1)));
     const variantId = toVariantGid(body.variantId);
+
+    const variantData = await shopifyAdmin<{ productVariant: { id: string; price: string } | null }>(
+      VARIANT_QUERY,
+      { id: variantId }
+    );
+    if (!variantData.productVariant) {
+      return NextResponse.json({ error: "Product variant not found." }, { status: 404 });
+    }
+    const originalPrice = Number(variantData.productVariant.price);
+    if (!Number.isFinite(originalPrice) || originalPrice <= 0) {
+      return NextResponse.json({ error: "Invalid Shopify product price." }, { status: 422 });
+    }
+    const unitPrice = body.paymentMethod === "prepaid" ? Math.max(0, originalPrice - 50) : originalPrice;
     const fullAddress = body.landmark
       ? `${body.address1}. Landmark: ${body.landmark}`
       : body.address1;
 
+    const lineItem: Record<string, unknown> = { variantId, quantity };
+    if (body.paymentMethod === "prepaid") {
+      lineItem.priceSet = { shopMoney: { amount: unitPrice.toFixed(2), currencyCode: "INR" } };
+    }
+
     const orderInput: Record<string, unknown> = {
-      lineItems: [{ variantId, quantity }],
+      lineItems: [lineItem],
       firstName: body.firstName,
       lastName: body.lastName,
       phone: `+91${body.phone}`,
@@ -102,14 +125,14 @@ export async function POST(request: NextRequest) {
         ...(body.addressType ? [{ key: "Address Type", value: body.addressType }] : []),
         ...(body.coupon ? [{ key: "Coupon", value: body.coupon }] : []),
       ],
-      tags: ["zomoky-checkout"],
+      tags: ["zomoky-checkout", body.paymentMethod === "cod" ? "cod" : "prepaid-pending"],
       sourceName: "zomoky-checkout",
     };
 
     const data = await shopifyAdmin<{
       orderCreate: {
         userErrors: { field: string[] | null; message: string }[];
-        order: { id: string; name: string; displayFinancialStatus: string; statusPageUrl: string | null } | null;
+        order: { id: string; name: string; displayFinancialStatus: string; statusPageUrl: string | null; totalPriceSet: { shopMoney: { amount: string; currencyCode: string } } } | null;
       };
     }>(MUTATION, {
       order: orderInput,
