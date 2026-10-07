@@ -21,11 +21,22 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "prepaid">("cod");
   const [quantity, setQuantity] = useState(1);
   const [form, setForm] = useState({
-    firstName: "", lastName: "", address1: "", city: "", state: "", pincode: "",
+    firstName: "", lastName: "", address1: "", address2: "", city: "", state: "", pincode: "",
     email: "", landmark: "",
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  function loadRazorpay(): Promise<void> {
+    if ((window as any).Razorpay) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error("Unable to load Razorpay checkout."));
+      document.body.appendChild(script);
+    });
+  }
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -81,7 +92,57 @@ export default function CheckoutPage() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Order failed");
-      setMessage(`Order ${data.order.name} created successfully.`);
+
+      if (paymentMethod === "cod") {
+        setMessage("Order " + data.order.name + " placed successfully. Pay on delivery.");
+        return;
+      }
+
+      await loadRazorpay();
+      const paymentResponse = await fetch("/api/razorpay/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ shopifyOrderId: data.order.id }),
+      });
+      const paymentData = await paymentResponse.json();
+      if (!paymentResponse.ok) throw new Error(paymentData.error || "Unable to start online payment.");
+
+      const Razorpay = (window as any).Razorpay;
+      if (!Razorpay) throw new Error("Razorpay checkout is unavailable.");
+
+      const razorpay = new Razorpay({
+        key: paymentData.keyId,
+        order_id: paymentData.id,
+        amount: paymentData.amount,
+        currency: paymentData.currency,
+        name: "ZOMOKY",
+        description: product?.product.title || "Zomoky order",
+        prefill: {
+          name: (form.firstName + " " + form.lastName).trim(),
+          email: form.email,
+          contact: "+91" + phone,
+        },
+        theme: { color: "#5f2b60" },
+        handler: async (result: any) => {
+          const verify = await fetch("/api/razorpay/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              shopifyOrderId: data.order.id,
+              razorpayOrderId: result.razorpay_order_id,
+              razorpayPaymentId: result.razorpay_payment_id,
+              razorpaySignature: result.razorpay_signature,
+            }),
+          });
+          const verifyData = await verify.json();
+          if (!verify.ok) throw new Error(verifyData.error || "Payment verification failed.");
+          setMessage("Payment successful. Order " + data.order.name + " is confirmed.");
+        },
+        modal: {
+          ondismiss: () => setMessage("Payment window closed. Your order remains pending until payment is completed."),
+        },
+      });
+      razorpay.open();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Order failed");
     } finally {
@@ -130,7 +191,7 @@ export default function CheckoutPage() {
             <label className="field"><input value={form.lastName} onChange={(e) => update("lastName", e.target.value)} placeholder="Last name*" required /></label>
           </div>
           <label className="field"><input value={form.address1} onChange={(e) => update("address1", e.target.value)} placeholder="Flat, house number, floor, building*" required /></label>
-          <label className="field"><input value={form.address2 || ""} onChange={(e) => update("address2" as keyof typeof form, e.target.value)} placeholder="Area, street, sector, village*" required /></label>
+          <label className="field"><input value={form.address2} onChange={(e) => update("address2", e.target.value)} placeholder="Area, street, sector, village*" required /></label>
           <button className="landmark-link" type="button" onClick={() => setShowLandmark((v) => !v)}>+ Landmark area</button>
           {showLandmark && <label className="field"><input value={form.landmark} onChange={(e) => update("landmark", e.target.value)} placeholder="Landmark (optional)" /></label>}
           <div className="two-col">
@@ -171,7 +232,7 @@ export default function CheckoutPage() {
 
         {message && <div className="success-box">{message}</div>}
         <section className="continue-area">
-          <button className="continue-button" disabled={loading}>{loading ? "Creating order…" : paymentMethod === "cod" ? "Place COD Order" : "Continue to Pay"}</button>
+          <button className="continue-button" disabled={loading || !product}>{loading ? "Creating order…" : paymentMethod === "cod" ? "Place COD Order" : "Continue to Pay"}</button>
         </section>
       </form>
     </main>
