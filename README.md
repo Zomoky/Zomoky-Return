@@ -9,7 +9,7 @@ Set these server-side environment variables in Vercel (or local `.env.local`):
     SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
     SHOPIFY_ADMIN_ACCESS_TOKEN=shpat_xxxxxxxxx
 
-Shopify's current Admin GraphQL API exposes orderCreate for programmatic order creation and requires the write_orders scope with an offline token. citeturn531087search1turn625113search0
+Shopify Admin GraphQL is used server-side for product lookup and order creation. Keep the Admin token only in Vercel/server environment variables; never expose it to the browser.\n\nciteturn531087search1turn625113search0
 
 ## Checkout URL
 
@@ -23,15 +23,33 @@ The checkout loads product/price from Shopify on the server and sends customer, 
 
 ## Current payment behaviour
 
-COD: creates a Shopify order with PENDING financial status.
+COD: creates a pending Shopify order.
 
-Prepaid: currently creates a PENDING Shopify order. The payment gateway step is not marked paid until a verified gateway webhook is added.
+Prepaid: creates the Shopify order with the ₹50 prepaid discount applied server-side, creates a Razorpay order, verifies the Razorpay Checkout signature, checks the payment is captured, and then marks the Shopify order paid. A Razorpay webhook endpoint is also included for asynchronous confirmation.
+
+## Razorpay environment variables
+
+    RAZORPAY_KEY_ID=...
+    RAZORPAY_KEY_SECRET=...
+    RAZORPAY_WEBHOOK_SECRET=...
+
+Configure the webhook URL as:
+
+    https://YOUR-CHECKOUT-DOMAIN/api/razorpay/webhook
+
+Subscribe to Razorpay `order.paid` (and optionally `payment.captured`) events. Webhook secrets must remain server-side.
 
 ## API routes
+
 
 - GET /api/shopify/product?variant_id=... — loads Shopify variant data.
 - POST /api/shopify/order — creates the Shopify order.
 
-## Next production integrations
+## Production checklist
 
-Connect Razorpay or Cashfree checkout + webhook, then Shiprocket/Goswift fulfillment and conversion tracking.
+- Set Shopify server environment variables.
+- Set Razorpay server environment variables.
+- Give the Shopify custom app the required order/product access and the permission to mark orders as paid.
+- Configure the Razorpay webhook URL and secret.
+- Deploy to Vercel and test with Razorpay test keys first.
+- Add Shiprocket/Goswift fulfillment and conversion tracking after checkout/payment verification is stable.
