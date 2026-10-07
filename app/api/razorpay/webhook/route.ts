@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { razorpayRequest, verifyWebhookSignature } from "@/lib/razorpay";
 import { shopifyAdmin } from "@/lib/shopify";
 
-const MARK_PAID = \`
+const MARK_PAID = `
   mutation MarkPaid($input: OrderMarkAsPaidInput!) {
     orderMarkAsPaid(input: $input) {
       userErrors { field message }
       order { id name displayFinancialStatus }
     }
   }
-\`;
+`;
 
 export async function POST(request: NextRequest) {
   const rawBody = await request.text();
